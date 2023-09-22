@@ -2,8 +2,8 @@ name: Deploy
 on:  [push]
 env:
   AWS_REGION: eu-west-1
-jobs:
 
+jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -30,8 +30,8 @@ jobs:
         run: npm run deploy-prod -w cdk
 
       - name: Archive cdk output
-          uses: actions/upload-artifact@v2
-          with:
-            name: cdk-out
-            path: cdk/cdk.out
-            retention-days: 30
+        uses: actions/upload-artifact@v2
+        with:
+          name: cdk-out
+          path: cdk/cdk.out
+          retention-days: 30
