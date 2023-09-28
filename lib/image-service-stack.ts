@@ -16,22 +16,33 @@ export interface STACK_PROPS extends cdk.StackProps {
   bucketName: string;
   errorsEmail: string;
   treeApiUrl: string;
+  env: {
+    account: string;
+    region: string;
+  };
+
 }
 export class ImageServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: STACK_PROPS) {
     super(scope, id, props);
 
-    const {  bucketName, treeApiUrl, errorsEmail } = props;
+    const {  bucketName, treeApiUrl, errorsEmail,env } = props;
+
     /**
-     * s3 bucket for storing tree photos
+     * Existing s3 bucket for storing tree photos
+     *
+     * Bucket created by Laravel Vapor (vapor.yml)
      */
     const bucket = s3.Bucket.fromBucketName(
       this,
       'Storage bucket',
       bucketName,
     );
+
     /**
      * Create an IAM user with put object permissions
+     *
+     * This user is any one using the iOS app
      */
     const user = new iam.User(this, 'iOsAppUser', {
       userName: 'ios-app-user',
@@ -97,13 +108,6 @@ export class ImageServiceStack extends cdk.Stack {
       },
     });
 
-    /**
-     * trigger the lambda function when an image is put on the bucket
-     */
-    bucket.addObjectCreatedNotification(
-      new s3n.LambdaDestination(s3TriggerLambda),
-      { prefix: 'public/photos/' }
-    )
 
     /**
      * Give the lambda function ability to read and write to the bucket
