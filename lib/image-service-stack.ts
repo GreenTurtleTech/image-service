@@ -108,6 +108,14 @@ export class ImageServiceStack extends cdk.Stack {
       },
     });
 
+    /**
+     * When bucket gets new upload, trigger the lambda function
+     */
+    bucket.addEventNotification(
+      s3.EventType.OBJECT_CREATED,
+      new s3n.LambdaDestination(s3TriggerLambda),
+      {prefix: 'public/photos/'}
+    );
 
     /**
      * Give the lambda function ability to read and write to the bucket
