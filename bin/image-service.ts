@@ -16,3 +16,10 @@ new ImageServiceStack(app, 'ImageServiceStack', {
   errorsEmail: process.env.ERRORS_EMAIL as string,
   treeApiUrl: process.env.TREE_API_URL as string || 'https://quaint-dublin-zvwqq2sxihei.vapor-farm-b1.com/api'
 });
+
+new ImageServiceStack(app, 'ImageServiceStackStaging', {
+  env,
+  bucketName: process.env.BUCKET_NAME_STAGING as string ||'protect-earth-stag-photos-57324',
+  errorsEmail: process.env.ERRORS_EMAIL as string,
+  treeApiUrl: process.env.TREE_API_URL as string || 'https://royal-delhi-n3vjzgjonhc9.vapor-farm-f1.com/api'
+});

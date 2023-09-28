@@ -9,7 +9,9 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "deploy": "cdk deploy"
+    "deploy": "cdk deploy",
+    "deploy:prod": "cdk deploy ImageServiceStack",
+    "deploy:staging": "cdk deploy ImageServiceStackStaging --profile=protect_earth"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",

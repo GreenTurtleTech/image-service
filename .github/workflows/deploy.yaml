@@ -1,11 +1,17 @@
 name: Deploy
 on:  [push]
+paths:
+  - bin
+  - lambdas
+  - lib
+  - package-lock.json
+
 env:
-  AWS_REGION: eu-west-1
+  AWS_REGION: eu-west-2
+  CDK_DEFAULT_REGION: eu-west-2
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
@@ -21,13 +27,13 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Deploy to dev
+      - name: Deploy to Staging if not main
         if: github.ref != 'refs/heads/main'
-        run: npm run deploy-dev -w cdk
+        run: npm run deploy:staging
 
-      - name: Deploy to prod
+      - name: Deploy to Prod if main
         if: github.ref == 'refs/heads/main'
-        run: npm run deploy-prod -w cdk
+        run: npm run deploy
 
       - name: Archive cdk output
         uses: actions/upload-artifact@v2
