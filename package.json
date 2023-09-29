@@ -11,7 +11,7 @@
     "cdk": "cdk",
     "deploy": "cdk deploy",
     "deploy:prod": "cdk deploy ImageServiceStack",
-    "deploy:staging": "cdk deploy ImageServiceStackStaging --profile=protect_earth"
+    "deploy:staging": "cdk deploy ImageServiceStackStaging "
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",

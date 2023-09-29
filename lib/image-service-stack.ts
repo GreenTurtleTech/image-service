@@ -44,12 +44,12 @@ export class ImageServiceStack extends cdk.Stack {
      *
      * This user is any one using the iOS app
      */
-    const user = new iam.User(this, 'iOsAppUser', {
-      userName: 'ios-app-user',
+    const user = new iam.User(this, `iOsAppUser${this.stackName}`, {
+      userName: `iOsAppUser${this.stackName}`,
     });
 
-    const policy = new iam.Policy(this, 'Policy', {
-      policyName: 'iOsAppIamUserPolicy',
+    const policy = new iam.Policy(this, `iOsAppUser${this.stackName}Policy`, {
+      policyName:`iOsAppUser${this.stackName}Policy`,
       statements: [
         new iam.PolicyStatement({
           actions: ['s3:PutObject'],
@@ -65,7 +65,7 @@ export class ImageServiceStack extends cdk.Stack {
     /**
      * sns topics errors are sent to.
      */
-    const errorsTopic = new sns.Topic(this, 'Errors topic', {});
+    const errorsTopic = new sns.Topic(this, `${this.stackName} Errors topic`, {});
 
     /**
      * Subscribe to the errors topic
@@ -77,7 +77,7 @@ export class ImageServiceStack extends cdk.Stack {
     /**
      * Lambda function for iOS client
      */
-    const s3ClientLayer = new nodejs.NodejsFunction(this, `s3-client-layer`, {
+    const s3ClientLayer = new nodejs.NodejsFunction(this, `${this.stackName}-s3-client-layer`, {
       entry: join(__dirname, '..', 'lambdas', 's3-client-layer', 'index.ts'),
       handler: 'handler',
       runtime: lambda.Runtime.NODEJS_18_X,
@@ -94,11 +94,11 @@ export class ImageServiceStack extends cdk.Stack {
     /**
      * Lambda function that runs when images are put on the bucket
      */
-    const s3TriggerLambda = new nodejs.NodejsFunction(this, 's3TriggerFunction', {
+    const s3TriggerLambda = new nodejs.NodejsFunction(this, `${this.stackName}-s3TriggerFunction`, {
       entry: join(__dirname, '..', 'lambdas', 's3-trigger', 'index.ts'),
       handler: 'handler',
       runtime: lambda.Runtime.NODEJS_18_X,
-      functionName: 'BucketPutHandler',
+      functionName: `${this.stackName}BucketPutHandler`,
       logRetention: logs.RetentionDays.THREE_MONTHS,
       environment: {
         treeApiUrl,
@@ -148,7 +148,7 @@ export class ImageServiceStack extends cdk.Stack {
     /**
      * Create a cloudwatch alarm for the lambda function errors
      */
-    let errorAlarm = new cloudwatch.Alarm(this, `s3-trigger-errors-alarm`, {
+    let errorAlarm = new cloudwatch.Alarm(this, `${this.stackName}-s3-trigger-errors-alarm`, {
       metric: s3TriggerLambda.metricErrors({
         period: cdk.Duration.minutes(1),
       }),
@@ -159,8 +159,6 @@ export class ImageServiceStack extends cdk.Stack {
       alarmDescription: 'Alarm for lambda errors',
     });
     errorAlarm.addAlarmAction(new actions.SnsAction(errorsTopic));
-
-
 
     /**
      * CDK output

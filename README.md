@@ -25,6 +25,8 @@ Deployment is automated in Github actions.
     - `npm run deploy:prod`
 - Deploy staging
     - `npm run deploy:staging`
+- If you have a `protect_earth` profile in `~/.aws/config`
+    - `--profile=protect_earth`
 
 ### Automated Deployments
 

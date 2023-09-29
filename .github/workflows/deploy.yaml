@@ -27,13 +27,13 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Deploy to Staging if not main
-        if: github.ref != 'refs/heads/main'
-        run: npm run deploy:staging
+      #- name: Deploy to Staging if not main
+      #  if: github.ref != 'refs/heads/main'
+      #  run: npm run deploy:staging
 
-      - name: Deploy to Prod if main
-        if: github.ref == 'refs/heads/main'
-        run: npm run deploy
+      #- name: Deploy to Prod if main
+      #  if: github.ref == 'refs/heads/main'
+      #  run: npm run deploy
 
       - name: Archive cdk output
         uses: actions/upload-artifact@v2
