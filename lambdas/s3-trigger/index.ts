@@ -1,7 +1,7 @@
 import { parse } from "path";
 import { pushToTreeTracker } from "./pushToTreeTracker";
 import * as uuid from "uuid";
-import { S3EventRecord } from "aws-lambda";
+import { S3Event, S3EventRecord } from "aws-lambda";
 
 import { S3Adapter } from "./s3";
 import { S3ObjectMetaData } from "./S3ObjectMetaData";
@@ -99,6 +99,7 @@ async function processS3Event({
   record: S3EventRecord;
   treeApiUrl: string;
 }) {
+  console.log({1: 'recived record', record })
   const s3Client = new S3Adapter();
   const { bucket, key, region } = extractRegionBucketAndKey(record);
   const processedKey = getProcessedKeyForObject(key)
@@ -132,10 +133,16 @@ async function processS3Event({
   });
 }
 
-export const handler = async function (event: { records: S3EventRecord[] }) {
+export const handler = async function (event: S3Event ) {
   const treeApiUrl = process.env.treeApiUrl as string;
-  event.records.forEach(record => processS3Event({
-    record,
-    treeApiUrl,
-  }));
+  if( event.Records && event.Records.length ){
+    event.Records.forEach(record => console.log({record}))
+    event.Records.forEach(record => processS3Event({
+      record,
+      treeApiUrl,
+    }));
+  }else{
+    console.log('No records in event', )
+  }
+
 }
