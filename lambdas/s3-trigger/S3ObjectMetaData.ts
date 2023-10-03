@@ -3,8 +3,7 @@ export interface S3ObjectMetaData {
     dateTaken: Date,
     latitude: number,
     longitude: number,
-    accuracy: number,
     species: string,
-    userId: string,
-    plotId: number
+    supervisor: string,
+    site: string;
 }

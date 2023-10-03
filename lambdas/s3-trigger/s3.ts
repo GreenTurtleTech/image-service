@@ -1,5 +1,5 @@
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { S3Client, GetObjectCommand, HeadObjectCommand, PutObjectCommand, HeadObjectCommandOutput } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, HeadObjectCommand, PutObjectCommand, HeadObjectCommandOutput, CopyObjectCommand } from "@aws-sdk/client-s3";
 interface Flavoring<FlavorT> {
   _type?: FlavorT;
 }
@@ -19,7 +19,7 @@ export class S3Adapter {
     });
   }
 
-  async generatePresignedUrl(bucket: S3BucketName, region: Region, key: S3Key, expiresIn: number) {
+  async generatePresignedUrl(bucket: S3BucketName, key: S3Key, expiresIn: number) {
     const command = new GetObjectCommand({
       Bucket: bucket,
       Key: key
@@ -29,7 +29,7 @@ export class S3Adapter {
       });
   }
 
-  async getObjectDetails(bucket: S3BucketName, region: Region, key: S3Key): Promise<HeadObjectCommandOutput> {
+  async getObjectDetails(bucket: S3BucketName, key: S3Key): Promise<HeadObjectCommandOutput> {
     const command = new HeadObjectCommand({
       Bucket: bucket,
       Key: key
@@ -37,12 +37,13 @@ export class S3Adapter {
     return await this.s3Client.send(command);
   }
 
-  async objectExists(bucket: S3BucketName, region: Region, key: S3Key) {
+  async objectExists(bucket: S3BucketName, key: S3Key) {
     try {
       await this.s3Client
         .send(new HeadObjectCommand({
           Bucket: bucket,
           Key: key,
+
         }));
     } catch (ex) {
       if (ex instanceof Error && ex.name === 'NotFound') {
@@ -53,15 +54,20 @@ export class S3Adapter {
     return true;
   }
 
-  async putEmptyObject(bucket: S3BucketName, region: Region, key: S3Key) {
-    const s3Client = new S3Client({});
-    const putCommand = new PutObjectCommand({
-      Body: "{}",
-      Bucket: bucket,
-      ContentType: "application/json",
-      Key: key,
-    });
+  async moveObject(bucket: S3BucketName, currentKey: S3Key, newKey: S3Key) {
+    try {
+      await this.s3Client
+        .send(new CopyObjectCommand({
+          Bucket: bucket,
+          Key: newKey,
+          CopySource: `${bucket}/${currentKey}`,
 
-    const putResponse = await s3Client.send(putCommand);
+        }));
+    } catch (error) {
+      console.log({moveObjectException: error})
+      throw error;
+    }
+    return true;
   }
+
 }

@@ -15,14 +15,14 @@ export async function pushToTreeTracker({ metaData, key, region, bucket, treeApi
   const data = {
     image_url,
     site: {
-      id: metaData.plotId.toString(),
+      id: metaData.site,
     },
     planted_at: metaData.dateTaken.toISOString(),
     species: {
       id: metaData.species,
     },
     supervisor: {
-      id: metaData.userId,
+      id: metaData.supervisor,
     },
     latitude: metaData.latitude,
     longitude: metaData.longitude,
