@@ -10,8 +10,8 @@
     "test": "jest",
     "cdk": "cdk",
     "deploy": "cdk deploy",
-    "deploy:prod": "cdk deploy ImageServiceStack",
-    "deploy:staging": "cdk deploy ImageServiceStackStaging "
+    "deploy:prod": "cdk deploy ImageService",
+    "deploy:staging": "cdk deploy ImageService_Staging"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
