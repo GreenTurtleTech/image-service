@@ -11,11 +11,12 @@ The following environment variables are used in the `image-service.ts` file:
 | `ACCOUNT_ID` | The AWS account ID to deploy the stack to. If not set, the default value is `'163934172718'`. |
 | `AWS_REGION` | The AWS region to deploy the stack to. If not set, the default value is `'eu-west-2'`. |
 | `BUCKET_NAME` | The name of the S3 bucket to create for production images. If not set, the default value is `'protect-earth-prod-photos-58374'`. |
-| `BUCKET_NAME_STAGING` | The name of the S3 bucket to create for staging images. If not set, the default value is `'protect-earth-stag-photos-57324'`. |
+| `BUCKET_NAME_STAGING` | The name of the S3 bucket to create for staging images.  |
 | `ERRORS_EMAIL` | The email address to send error notifications to. |
-| `TREE_API_URL` | The URL of the Tree API to use. If not set, the default value is `'https://quaint-dublin-zvwqq2sxihei.vapor-farm-b1.com/api'` for production and `'https://royal-delhi-n3vjzgjonhc9.vapor-farm-f1.com/api'` for staging. |
+| `TREE_API_URL` | The URL of the Tree API to use. |
+| `TREE_API_URL_STAGING` | The URL of the staging tree API to use |
 
-These environment variables are used to configure the `ImageServiceStack` stack.
+These environment variables are used to configure the `ImageService` stack.
 
 ## Deployment
 
