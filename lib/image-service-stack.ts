@@ -1,16 +1,16 @@
 import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import * as s3 from 'aws-cdk-lib/aws-s3';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
-import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
-import * as logs from 'aws-cdk-lib/aws-logs';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 import * as actions from 'aws-cdk-lib/aws-cloudwatch-actions';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as logs from 'aws-cdk-lib/aws-logs';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
-import {join} from 'path';
+import { Construct } from 'constructs';
+import { join } from 'path';
 export interface STACK_PROPS extends cdk.StackProps {
   //The name you see in the list of S3 buckets in the AWS console
   bucketName: string;
@@ -62,6 +62,30 @@ export class ImageServiceStack extends cdk.Stack {
     });
 
     policy.attachToUser(user);
+
+    /**
+     * Create an IAM user with list object permissions
+     *
+     * This user is any one using the iOS app
+     */
+    const userDev = new iam.User(this, `iOsAppUser${this.stackName}Developer`, {
+      userName: `iOsAppUser${this.stackName}Developer`,
+    });
+
+    const policyDev = new iam.Policy(this, `iOsAppUser${this.stackName}DeveloperPolicy`, {
+      policyName:`iOsAppUser${this.stackName}Policy`,
+      statements: [
+        new iam.PolicyStatement({
+          actions: ['s3:GetObject', 's3:ListBucket'],
+          resources: [
+            bucket.arnForObjects("*"),
+            bucket.bucketArn
+          ],
+        }),
+      ],
+    });
+
+    policyDev.attachToUser(userDev);
     /**
      * sns topics errors are sent to.
      */
@@ -74,38 +98,27 @@ export class ImageServiceStack extends cdk.Stack {
       new subscriptions.EmailSubscription(errorsEmail)
     );
 
-    /**
-     * Lambda function for iOS client
-     */
-    const s3ClientLayer = new nodejs.NodejsFunction(this, `${this.stackName}-s3-client-layer`, {
-      entry: join(__dirname, '..', 'lambdas', 's3-client-layer', 'index.ts'),
-      handler: 'handler',
-      runtime: lambda.Runtime.NODEJS_18_X,
-      logRetention: logs.RetentionDays.THREE_MONTHS,
-      bundling: {
-        minify: false,
-      },
-      environment: {
-        UPLOAD_BUCKET: bucket.bucketName,
-      }
-    });
-
 
     /**
      * Lambda function that runs when images are put on the bucket
      */
     const s3TriggerLambda = new nodejs.NodejsFunction(this, `${this.stackName}-s3TriggerFunction`, {
-      entry: join(__dirname, '..', 'lambdas', 's3-trigger', 'index.ts'),
+      entry: join(__dirname, '..', 'lambdas', 'trigger', 'index.js'),
       handler: 'handler',
       runtime: lambda.Runtime.NODEJS_18_X,
       functionName: `${this.stackName}BucketPutHandler`,
       logRetention: logs.RetentionDays.THREE_MONTHS,
       environment: {
         treeApiUrl,
+        bucketName,
+        region: env.region,
       },
       bundling: {
         minify: false,
+        keepNames: true,
+        forceDockerBundling: true,
       },
+      depsLockFilePath: join(__dirname, '..', 'lambdas', 'trigger', 'package-lock.json'),
     });
 
     /**
@@ -114,7 +127,7 @@ export class ImageServiceStack extends cdk.Stack {
     bucket.addEventNotification(
       s3.EventType.OBJECT_CREATED,
       new s3n.LambdaDestination(s3TriggerLambda),
-      {prefix: 'public/photos/'}
+      {prefix: 'treeuploads'}
     );
 
     /**
