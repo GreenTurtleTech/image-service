@@ -37,20 +37,44 @@ Deployment is automated in Github actions.
     - Deploys to staging.
 
 
-## Deploy New Stacks
+## Deployment
 
-If you want to deploy a new instance of these stacks in a new account:
+Deployment is automated in Github actions.
 
-- Bootstrap this stack in that account
-    - `cdk bootstrap aws://<account-id>/<region>`
+- Deployg to prod:
+    - `npm run deploy:prod`
+- Deploy staging
+    - `npm run deploy:staging`
+- If you have a `protect_earth` profile in `~/.aws/config`
+    - `--profile=protect_earth`
+
+### Automated Deployments
+
+- Push to main branch
+    - Deploys to prod
+- Push to any other branch
+    - Deploys to staging.
+
+
+## Create For New Client
+
+### Assumptions
+
+Before beginging, make sure these assumptions are true:
+
+- You have AWS CDK toolkit installed.
+    - https://docs.aws.amazon.com/cdk/v2/guide/cli.html
+- You haved Bootstrapped CDK for the account and region you will be deploying to.
     - https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html
-- Then set the environment variables
+- You have a named profile setup for AWS CLI for this Github account
+    - https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-using-profiles
 
-## Useful commands
+### Create New Stack
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npm run deploy`      deploy stack
-* `npm runcdk diff`        compare deployed stack with current state
-* `npm run cdk synth`       emits the synthesized CloudFormation template
+- Deploy the first time locally.
+    - Setup .env file locally with the .env variables for this client
+    - Deploy to staging
+        - `npm run cdk deploy cdk deploy ImageServiceStackStaging --profile=client-aws-profile`
+    - Deploy prod as well, if stage deploy worked:
+        - `npm run cdk deploy cdk deploy ImageServiceStackStaging --profile=client-aws-profile`
+- Setup automated deployments
