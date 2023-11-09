@@ -9,3 +9,4 @@ cdk.out
 .env
 
 !lambdas/trigger/index.js
+!cat-test.js
