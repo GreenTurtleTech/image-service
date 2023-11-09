@@ -53,7 +53,7 @@ async function getMetaData({unproccesedKey, bucket}) {
 }
 
 //POST to the tree api
-async function pushToTreeTracker({metaData, treeApiUrl}) {
+async function pushToTreeTracker({metaData, treeApiUrl,unproccesedKey }) {
     const res = await fetch(treeApiUrl, {
         method: 'POST',
         headers: {
@@ -61,27 +61,34 @@ async function pushToTreeTracker({metaData, treeApiUrl}) {
         },
         body: JSON.stringify(metaData),
     }).then(r => {
-        if( r.ok()){
+        if( r.ok){
             return r.json();
         }
-        console.log(`Error pushing object ${unproccesedKey} to tree api. ${error.message}`);
         try {
             r = r.json();
             console.log({r})
-        } catch (err) {}
-    });
+        } catch (error) {
+            console.log(`Error pushing object ${unproccesedKey} to tree api. ${error.message}`);
+        }
+    }).catch(error => {
+        console.log(`Error pushing object ${unproccesedKey} to tree api. ${error.message}`);
+    })
+    if( ! res ) {
+        return false;
+    }
     return  res.status >= 200 && res.status < 300;
 }
 
 // Put json file with metaData with name unprocessedKey in processed folder
 async function markProcessed({processedKey,bucket,metaData}) {
+
     try {
-        const results = s3.putObject({
+        const s3PutResponse = await s3.putObject({
             Bucket: bucket,
             Body: JSON.stringify(metaData),
             Key: processedKey,
-        });
-        console.log({results});
+        }).promise();
+        console.log({s3PutResponse})
         return true;
     } catch (error) {
         console.log({ error });
@@ -89,13 +96,15 @@ async function markProcessed({processedKey,bucket,metaData}) {
     }
 }
 exports.handler = async (event, context) => {
-    // Get the object from the event and show its content type
-    const bucket = event.Records[0].s3.bucket.name;
-    const unproccesedKey = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
-    const processedKey = `${unproccesedKey.replace(UNPROCCESED_PREFIX, PROCESSED_PREFIX)}.json`;
     const {
         treeApiUrl,
+        bucketName,
     } = process.env;
+    const bucket = bucketName && bucketName.length ? bucketName : event.Records[0].s3.bucket.name;
+
+    const unproccesedKey = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
+    const processedKey = `${unproccesedKey.replace(UNPROCCESED_PREFIX, PROCESSED_PREFIX)}.json`;
+
     const completed = await hasProcesseded({processedKey, bucket});
     if( completed ) {
         console.log('Already processed',{hasProcesseded, processedKey});
@@ -104,15 +113,20 @@ exports.handler = async (event, context) => {
     console.log('Processing', {unproccesedKey, processedKey});
     const metaData = await getMetaData({unproccesedKey, bucket});
     await Promise.all([
-        await pushToTreeTracker({metaData, treeApiUrl}),
+        await pushToTreeTracker({metaData, treeApiUrl,unproccesedKey}),
         await markProcessed({processedKey,bucket,metaData})
-    ]);
-
-    console.log('Done', {
-        processedKey,
-        unproccesedKey,
-        metaData,
-        moved
+    ])
+    .catch(error => {
+        console.log({error});
     })
+    .finally(() => {
+        console.log('Done', {
+            processedKey,
+            unproccesedKey,
+            metaData,
+        })
+    })
+
+
     return;
 };
