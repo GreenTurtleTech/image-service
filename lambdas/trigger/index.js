@@ -30,20 +30,22 @@ async function getMetaData({unproccesedKey, bucket}) {
         // iOS app sends metaData.Metadata
         const metaDataFromIos = metaData.Metadata;
         const id = metaDataFromIos.phimageid ? metaDataFromIos.phimageid : '';
-        const dateTaken = metaDataFromIos.datetaken ? metaDataFromIos.datetaken : '';
+        const planted_at = metaDataFromIos.datetaken ? metaDataFromIos.datetaken : '';
         const latitude = metaDataFromIos.latitude ? metaDataFromIos.latitude : null;
         const longitude = metaDataFromIos.longitude ? metaDataFromIos.longitude : null;
         const species = metaDataFromIos.species || '';
         const supervisor = metaDataFromIos.supervisor || '';
         const site = metaDataFromIos.site || '';
+        const device_id = metaDataFromIos.deviceId || '';
         return {
             id,
-            dateTaken,
+            planted_at,
             latitude,
             longitude,
             site,
             species,
             supervisor,
+            device_id,
         };
     } catch (err) {
         console.log({ err });

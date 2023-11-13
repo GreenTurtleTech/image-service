@@ -24,6 +24,7 @@ const command = new PutObjectCommand({
         longitude: '79.9959',
         species: '1111-aaaa-222-rrrr',
         supervisor: '1111-aaaa-222-rrrr',
+        deviceId: '42',
         site: '1111-aaaa-222-rrrr',
     },
 });
