@@ -97,10 +97,11 @@ async function markProcessed({processedKey,bucket,metaData}) {
         return false;
     }
 }
-exports.handler = async (event, context) => {
+exports.handler = async (event,) => {
     const {
         treeApiUrl,
         bucketName,
+        region,
     } = process.env;
     const bucket = bucketName && bucketName.length ? bucketName : event.Records[0].s3.bucket.name;
 
@@ -113,7 +114,8 @@ exports.handler = async (event, context) => {
         return;
     }
     console.log('Processing', {unproccesedKey, processedKey});
-    const metaData = await getMetaData({unproccesedKey, bucket});
+    let metaData = await getMetaData({unproccesedKey, bucket});
+    metaData.img_url = `https://${bucket}.s3.${region}.amazonaws.com/${processedKey}`
     await Promise.all([
         await pushToTreeTracker({metaData, treeApiUrl,unproccesedKey}),
         await markProcessed({processedKey,bucket,metaData})
