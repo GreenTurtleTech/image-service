@@ -20,13 +20,16 @@ export interface STACK_PROPS extends cdk.StackProps {
     account: string;
     region: string;
   };
+  //Prefix of directory that trees need to be uploaded in
+  //If not set, "treeuploads" is used
+  prefix?: string;
 
 }
 export class ImageServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: STACK_PROPS) {
     super(scope, id, props);
 
-    const {  bucketName, treeApiUrl, errorsEmail,env } = props;
+    const {  bucketName, treeApiUrl, errorsEmail, env, prefix  } = props;
 
     /**
      * Existing s3 bucket for storing tree photos
@@ -127,7 +130,7 @@ export class ImageServiceStack extends cdk.Stack {
     bucket.addEventNotification(
       s3.EventType.OBJECT_CREATED,
       new s3n.LambdaDestination(s3TriggerLambda),
-      {prefix: 'treeuploads'}
+      {prefix: prefix ? prefix : 'treeuploads'}
     );
 
     /**
