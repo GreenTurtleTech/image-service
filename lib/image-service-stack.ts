@@ -127,7 +127,7 @@ export class ImageServiceStack extends cdk.Stack {
     bucket.addEventNotification(
       s3.EventType.OBJECT_CREATED,
       new s3n.LambdaDestination(s3TriggerLambda),
-      {prefix: 'treeuploads'}
+      {prefix: 'unituploads'}
     );
 
     /**
