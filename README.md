@@ -43,6 +43,7 @@ The following environment variables are used in the `image-service.ts` file:
 | `ERRORS_EMAIL` | The email address to send error notifications to. |
 | `TREE_API_URL` | The URL of the Tree API to use. |
 | `TREE_API_URL_STAGING` | The URL of the staging tree API to use |
+| `PREFIX` | The parent directory all photos must upload to. Default is `treeuploads`
 
 These environment variables are used to configure the `ImageService` stack.
 
