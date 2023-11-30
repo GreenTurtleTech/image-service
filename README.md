@@ -2,12 +2,12 @@
 
 Creates infrastructure for uploads to s3 and sending them to tree-tracker-web. Also has the Lambda function code.
 
-- When a file is uploaded to `/treeuploads` in the bucket,
+- When a file is uploaded to `/unituploads` in the bucket,
     - Lambda function checks if this item has been processed
-        - It checks if a file with the same name, but `treeuploads` replaced with `processed` and with a `.json` file ending added on. If so, it stops running.
+        - It checks if a file with the same name, but `unituploads` replaced with `processed` and with a `.json` file ending added on. If so, it stops running.
     - Gets the meta data from the s3 object
     - Sends that to tree tracker API
-    - Creates a JSON file with the same name, but `treeuploads` replaced with `processed` and with a `.json` file ending added on.
+    - Creates a JSON file with the same name, but `unituploads` replaced with `processed` and with a `.json` file ending added on.
         - This file contains the metadata.
         - That way if it doesn't end up saved in the tree tracker, we have it.
 - If you change any of the infrastruture, or the trigger function:
