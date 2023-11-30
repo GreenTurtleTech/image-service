@@ -15,11 +15,13 @@ new ImageServiceStack(app, 'ImageServiceStack', {
   bucketName: process.env.BUCKET_NAME as string,
   errorsEmail: process.env.ERRORS_EMAIL as string,
   treeApiUrl: process.env.TREE_API_URL as string,
+  prefix: process.env.PREFIX as string | undefined
 });
 
 new ImageServiceStack(app, 'ImageServiceStackStaging', {
   env,
   bucketName: process.env.BUCKET_NAME_STAGING as string,
   errorsEmail: process.env.ERRORS_EMAIL as string,
-  treeApiUrl: process.env.TREE_API_URL_STAGING as string || process.env.TREE_API_URL as string
+  treeApiUrl: process.env.TREE_API_URL_STAGING as string || process.env.TREE_API_URL as string,
+  prefix: process.env.PREFIX as string | undefined
 });
