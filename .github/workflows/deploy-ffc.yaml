@@ -1,4 +1,4 @@
-name: Deploy PE
+name: Deploy FFC
 on:  [push]
 paths:
   - bin
@@ -7,9 +7,10 @@ paths:
   - package-lock.json
 
 env:
-  AWS_REGION: eu-west-2
-  CDK_DEFAULT_REGION: eu-west-2
-  ACCOUNT_ID: ?
+  AWS_REGION: eu-west-1
+  CDK_DEFAULT_REGION: eu-west-1
+  ACCOUNT_ID: 353704616310
+
 jobs:
   deploy:
     steps:
@@ -19,7 +20,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@master
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.FFC_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
@@ -36,16 +37,15 @@ jobs:
       - name: Deploy to Staging
         run: npm run deploy:staging
         env:
-          BUCKET_NAME: protect-earth-stag-photos-57324
-          TREE_API_URL:  https://api-staging.protect.earth
-
+          BUCKET_NAME: ffc-stag-photos-83641
+          TREE_API_URL: https://api-staging.thefutureforestcompany.com
 
       - name: Deploy to Prod if main
       if: github.ref == 'refs/heads/main'
       run: npm run deploy
       env:
-          BUCKET_NAME: protect-earth-prod-photos-58374
-          TREE_API_URL:  https://api.protect.earth
+          BUCKET_NAME: ffc-prod-photos-83640
+          TREE_API_URL: https://api.thefutureforestcompany.com
 
       - name: Archive cdk output
         uses: actions/upload-artifact@v2
