@@ -8,7 +8,7 @@ const fs = require('fs');
  * node uploadCat.js
  */
 const body = fs.createReadStream('./smolcat-wide.png');
-const Bucket = 'testimgtree';
+const Bucket = 'protect-earth-stag-photos-57324';
 
 const client = new S3Client({ region: "us-east-2" });
 

@@ -1,5 +1,5 @@
 {
-  "app": "node bin/image-service.js",
+  "app": "npx ts-node --prefer-ts-exts bin/image-service.ts",
   "watch": {
     "include": [
       "**"
@@ -7,7 +7,9 @@
     "exclude": [
       "README.md",
       "cdk*.json",
-      "jest.config.js",
+      "**/*.d.ts",
+      "**/*.js",
+      "tsconfig.json",
       "package*.json",
       "yarn.lock",
       "node_modules",

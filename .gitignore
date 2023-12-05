@@ -3,3 +3,6 @@ node_modules
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+bin/image-service.js
+lib/image-service-stack.js
+.env
