@@ -74,11 +74,11 @@ async function pushToTreeTracker({metaData, treeApiUrl}) {
 // Put empty file with name unprocessedKey in processed folder
 async function markProcssed({processedKey,bucket}) {
     try {
-        const results = s3.putObject({
+        const results = await s3.putObject({
             Bucket: bucket,
             Body: '',
             Key: processedKey,
-        });
+        }).promise();
         console.log({results});
         return true;
     } catch (error) {
