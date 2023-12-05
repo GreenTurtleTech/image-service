@@ -1,0 +1,42 @@
+name: Deploy
+on:  [push]
+paths:
+  - bin
+  - lambdas
+  - lib
+  - package-lock.json
+
+env:
+  AWS_REGION: eu-west-2
+  CDK_DEFAULT_REGION: eu-west-2
+
+jobs:
+  deploy:
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Deploy to Staging
+        run: npm run deploy:staging
+
+      - name: Deploy to Prod if main
+      if: github.ref == 'refs/heads/main'
+      run: npm run deploy
+
+      - name: Archive cdk output
+        uses: actions/upload-artifact@v2
+        with:
+          name: cdk-out
+          path: cdk/cdk.out
+          retention-days: 30
