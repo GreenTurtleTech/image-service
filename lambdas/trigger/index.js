@@ -21,7 +21,7 @@ async function hasProcesseded({processedKey, bucket}) {
 
 //Get metaData.Metadata from unpoccessed object
 // Return the data we need to send to the tree api
-async function getMetaData({unproccesedKey, bucket,region}) {
+async function getMetaData({unproccesedKey, bucket, region}) {
     try {
         const metaData = await s3.headObject({
             Bucket: bucket,
@@ -29,29 +29,24 @@ async function getMetaData({unproccesedKey, bucket,region}) {
         }).promise();
         // iOS app sends metaData.Metadata
         const metaDataFromIos = metaData.Metadata;
-        const id = metaDataFromIos.phimageid ? metaDataFromIos.phimageid : '';
         const dateTaken = metaDataFromIos.datetaken ? metaDataFromIos.datetaken : '';
-        const latitude = metaDataFromIos.latitude ? metaDataFromIos.latitude : null;
-        const longitude = metaDataFromIos.longitude ? metaDataFromIos.longitude : null;
+        const latitude = metaDataFromIos.latitude ? parseFloat(metaDataFromIos.latitude) : null;
+        const longitude = metaDataFromIos.longitude ? parseFloat(metaDataFromIos.longitude) : null;
         const species = metaDataFromIos.species || '';
         const supervisor = metaDataFromIos.supervisor || '';
         const site = metaDataFromIos.site || '';
         return {
-            id,
-            dateTaken,
             latitude,
             longitude,
-            site,
-            species,
             supervisor: {
                 id: supervisor
-              },
-              species: {
+            },
+            species: {
                 id: species
-              },
-              site: {
+            },
+            site: {
                 id: site
-              },
+            },
             planted_at: dateTaken,
             image_url: `https://s3-${region}.amazonaws.com/${bucket}/${unproccesedKey}`,
         };
@@ -75,6 +70,7 @@ async function pushToTreeTracker({metaData, treeApiUrl}) {
             },
             body: JSON.stringify(metaData),
         });
+        console.log({res});
         // return true if 20X status code
         return res.status >= 200 && res.status < 300;
     } catch (err) {
