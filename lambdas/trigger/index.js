@@ -1,7 +1,7 @@
 const { S3 } = require('aws-sdk');
 const s3 = new S3({ apiVersion: '2006-03-01' });
 
-const UNPROCCESED_PREFIX = 'treeunits/';
+const UNPROCCESED_PREFIX = 'unituploads/';
 const PROCESSED_PREFIX = 'units/';
 
 //Try to get processed object from the bucket.
