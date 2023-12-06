@@ -68,7 +68,6 @@ async function pushToTreeTracker({metaData, treeApiUrl,token}) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Bearer: ': token,
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(metaData),
