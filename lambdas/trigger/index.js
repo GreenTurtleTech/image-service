@@ -53,7 +53,7 @@ async function getMetaData({unproccesedKey, bucket,region}) {
                 id: site
               },
             planted_at: dateTaken,
-            image_url: `https://s3-${region}.amazonaws.com/${bucket}`,
+            image_url: `https://s3-${region}.amazonaws.com/${bucket}/${unproccesedKey}`,
         };
 
     } catch (err) {
