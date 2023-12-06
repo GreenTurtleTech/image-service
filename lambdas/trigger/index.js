@@ -59,18 +59,23 @@ async function getMetaData({unproccesedKey, bucket, region}) {
 }
 
 //POST to the tree api
-async function pushToTreeTracker({metaData, treeApiUrl}) {
-    console.log({metaData,treeApiUrl});
+async function pushToTreeTracker({metaData, treeApiUrl,token}) {
+
 
     try {
+        // Docs: https://bump.sh/green-turtle/doc/tree-tracker-api/operation/operation-post-upload#operation-post-upload-body-application-json-image_url
         const res = await fetch(`${treeApiUrl}/upload`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Bearer: ': token
             },
             body: JSON.stringify(metaData),
         });
-        console.log({res});
+        console.log({pushToTreeTrackerApi:{
+            status: res.status,
+            statusText: res.statusText
+        }});
         // return true if 20X status code
         return res.status >= 200 && res.status < 300;
     } catch (err) {
@@ -102,7 +107,8 @@ exports.handler = async (event, context) => {
     const processedKey = unproccesedKey.replace(UNPROCCESED_PREFIX, PROCESSED_PREFIX);
     const {
         treeApiUrl,
-        region
+        region,
+        token
     } = process.env;
     const completed = await hasProcesseded({processedKey, bucket});
     if( completed ) {
@@ -112,7 +118,7 @@ exports.handler = async (event, context) => {
     const metaData = await getMetaData({unproccesedKey, bucket,region});
     console.log({metaData,treeApiUrl});
 
-    const pushed = await pushToTreeTracker({metaData, treeApiUrl});
+    const pushed = await pushToTreeTracker({metaData, treeApiUrl,token});
     if( ! pushed    ) {
         throw new Error(`Error pushing object ${unproccesedKey} to tree api.`);
     }

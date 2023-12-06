@@ -41,10 +41,14 @@ The following environment variables are used in the `image-service.ts` file:
 | `BUCKET_NAME` | The name of the S3 bucket to create for production images. If not set, the default value is `'protect-earth-prod-photos-58374'`. |
 | `BUCKET_NAME_STAGING` | The name of the S3 bucket to create for staging images.  |
 | `ERRORS_EMAIL` | The email address to send error notifications to. |
-| `TREE_API_URL` | The URL of the Tree API to use. |
+| `TREE_API_URL` | The URL of the Tree API to use.  |
 | `TREE_API_URL_STAGING` | The URL of the staging tree API to use |
+| `TREE_API_TOKEN` | The bearer token for production
+| `TREE_API_TOKEN_STAGING` | The bearer token for staging
 
 These environment variables are used to configure the `ImageService` stack.
+
+Note: `TREE_API_URL` and `TREE_API_URL_STAGING` are the URL for the application, the /uploads endpoint will be used.
 
 ## Deployment
 

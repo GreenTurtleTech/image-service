@@ -12,21 +12,25 @@ import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';
 import { join } from 'path';
 export interface STACK_PROPS extends cdk.StackProps {
-  //The name you see in the list of S3 buckets in the AWS console
+  // The name you see in the list of S3 buckets in the AWS console
   bucketName: string;
+  // The email to send errors to
   errorsEmail: string;
+  // URL for tree API `/uploads` will be used as endpoint.
   treeApiUrl: string;
   env: {
     account: string;
     region: string;
   };
+  // Bearer token for api request
+  token:string;
 
 }
 export class ImageServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: STACK_PROPS) {
     super(scope, id, props);
 
-    const {  bucketName, treeApiUrl, errorsEmail,env } = props;
+    const {  bucketName, treeApiUrl, errorsEmail,env,token } = props;
 
     /**
      * Existing s3 bucket for storing tree photos
@@ -112,6 +116,7 @@ export class ImageServiceStack extends cdk.Stack {
         treeApiUrl,
         bucketName,
         region: env.region,
+        token
       },
       bundling: {
         minify: false,
