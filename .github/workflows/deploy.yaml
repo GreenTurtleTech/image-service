@@ -9,7 +9,10 @@ paths:
 env:
   AWS_REGION: eu-west-2
   CDK_DEFAULT_REGION: eu-west-2
-  ACCOUNT_ID: ?
+  ACCOUNT_ID: 163934172718
+  BUCKET_NAME: protect-earth-prod-photos-58374
+  BUCKET_NAME_STAGING: protect-earth-stag-photos-57324
+
 jobs:
   deploy:
     steps:
@@ -36,7 +39,6 @@ jobs:
       - name: Deploy to Staging
         run: npm run deploy:staging
         env:
-          BUCKET_NAME: protect-earth-stag-photos-57324
           TREE_API_URL:  https://api-staging.protect.earth
 
 
@@ -44,7 +46,6 @@ jobs:
       if: github.ref == 'refs/heads/main'
       run: npm run deploy
       env:
-          BUCKET_NAME: protect-earth-prod-photos-58374
           TREE_API_URL:  https://api.protect.earth
 
       - name: Archive cdk output

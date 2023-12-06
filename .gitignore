@@ -6,3 +6,4 @@ cdk.out
 bin/image-service.js
 lib/image-service-stack.js
 .env
+bin/image-service.js
