@@ -21,7 +21,7 @@ async function hasProcesseded({processedKey, bucket}) {
 
 //Get metaData.Metadata from unpoccessed object
 // Return the data we need to send to the tree api
-async function getMetaData({unproccesedKey, bucket}) {
+async function getMetaData({unproccesedKey, bucket,region}) {
     try {
         const metaData = await s3.headObject({
             Bucket: bucket,
@@ -43,19 +43,32 @@ async function getMetaData({unproccesedKey, bucket}) {
             longitude,
             site,
             species,
-            supervisor,
+            supervisor: {
+                id: supervisor
+              },
+              species: {
+                id: species
+              },
+              site: {
+                id: site
+              },
+            planted_at: dateTaken,
+            image_url: `https://s3-${region}.amazonaws.com/${bucket}`,
         };
+
     } catch (err) {
         console.log({ err });
-        throw new Error(`Error getting object ${key} from bucket ${bucket}.`);
+        throw new Error(`Error getting object ${unproccesedKey} from bucket ${bucket}.`);
     }
 
 }
 
 //POST to the tree api
 async function pushToTreeTracker({metaData, treeApiUrl}) {
+    console.log({metaData,treeApiUrl});
+
     try {
-        const res = await fetch(treeApiUrl, {
+        const res = await fetch(`${treeApiUrl}/upload`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -93,20 +106,23 @@ exports.handler = async (event, context) => {
     const processedKey = unproccesedKey.replace(UNPROCCESED_PREFIX, PROCESSED_PREFIX);
     const {
         treeApiUrl,
+        region
     } = process.env;
     const completed = await hasProcesseded({processedKey, bucket});
     if( completed ) {
         console.log('Already processed',{hasProcesseded, processedKey});
         return;
     }
-    const metaData = await getMetaData({unproccesedKey, bucket});
+    const metaData = await getMetaData({unproccesedKey, bucket,region});
+    console.log({metaData,treeApiUrl});
+
     const pushed = await pushToTreeTracker({metaData, treeApiUrl});
     if( ! pushed    ) {
-        throw new Error(`Error pushing object ${key} to tree api.`);
+        throw new Error(`Error pushing object ${unproccesedKey} to tree api.`);
     }
     const moved = await markProcssed({processedKey,bucket});
     if( ! moved ) {
-        throw new Error(`Error moving object ${key} to processed folder.`);
+        throw new Error(`Error moving object ${unproccesedKey} to ${processedKey}`);
     }
     console.log('Done', {
         processedKey,
